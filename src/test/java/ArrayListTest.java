@@ -2,14 +2,15 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.util.*;
+import java.util.function.UnaryOperator;
 
 public class ArrayListTest {
   
   @DataProvider(name = "collectionImpl")
   public Object[] collectionImpl() {
     return new Object[]{
-        new ArrayList<String>(),
-        new LinkedList<String>()
+        new ArrayList<>(),
+        new LinkedList<>()
     };
   }
   
@@ -95,8 +96,8 @@ public class ArrayListTest {
     stringList.add("1");
     stringList.add("2");
     stringList.add("3");
-    
-    List<String> secondStringList = new ArrayList<String>();
+  
+    List<String> secondStringList = new ArrayList<>();
     
     //when
     boolean isListAdded = secondStringList.addAll(stringList);
@@ -111,7 +112,7 @@ public class ArrayListTest {
   @Test(dataProvider = "collectionImpl")
   public void addAll_onEmptyList(List<String> stringList) {
     //given
-    List<String> secondStringList = new ArrayList<String>();
+    List<String> secondStringList = new ArrayList<>();
     
     //when
     boolean isListAdded = secondStringList.addAll(stringList);
@@ -128,7 +129,7 @@ public class ArrayListTest {
   public void addAll_listWithNullObject(List<String> stringList) {
     //given
     stringList.add(null);
-    List<String> secondStringList = new ArrayList<String>();
+    List<String> secondStringList = new ArrayList<>();
     
     //when
     boolean isListAdded = secondStringList.addAll(stringList);
@@ -147,8 +148,8 @@ public class ArrayListTest {
     stringList.add("1");
     stringList.add("2");
     stringList.add("3");
-    
-    List<String> secondStringList = new ArrayList<String>();
+  
+    List<String> secondStringList = new ArrayList<>();
     secondStringList.add("Nothing");
     
     //when
@@ -165,7 +166,7 @@ public class ArrayListTest {
   @Test(dataProvider = "collectionImpl")
   public void addAllWithIndex_onEmptyList(List<String> stringList) {
     //given
-    List<String> secondStringList = new ArrayList<String>();
+    List<String> secondStringList = new ArrayList<>();
     secondStringList.add("Nothing");
     
     //when
@@ -183,8 +184,8 @@ public class ArrayListTest {
   public void addAllWithIndex_onListWithNullObject(List<String> stringList) {
     //given
     stringList.add(null);
-    
-    List<String> secondStringList = new ArrayList<String>();
+  
+    List<String> secondStringList = new ArrayList<>();
     secondStringList.add("Nothing");
     
     //when
@@ -202,8 +203,8 @@ public class ArrayListTest {
   public void addAllWithIndex_filledListOnZeroIndex(List<String> stringList) {
     //given
     stringList = Arrays.asList("A", "B", "C");
-    
-    List<String> secondStringList = new ArrayList<String>();
+  
+    List<String> secondStringList = new ArrayList<>();
     secondStringList.add("Nothing");
     
     //when
@@ -221,8 +222,8 @@ public class ArrayListTest {
   public void addAllWithIndex_onNegativeIndex(List<String> stringList) {
     //given
     stringList.add(null);
-    
-    List<String> secondStringList = new ArrayList<String>();
+  
+    List<String> secondStringList = new ArrayList<>();
     secondStringList.add("Nothing");
     
     //when
@@ -339,8 +340,8 @@ public class ArrayListTest {
   public void containsAll_filledList(List<String> stringList) {
     //given
     stringList = Arrays.asList("A", "B", "C");
-    
-    List<String> secondStringList = new ArrayList<String>();
+  
+    List<String> secondStringList = new ArrayList<>();
     secondStringList.add("Nothing");
     secondStringList.addAll(stringList);
     
@@ -359,8 +360,8 @@ public class ArrayListTest {
   public void containsAll_filledListOnLinkedList(List<String> stringList) {
     //given
     stringList = Arrays.asList("A", "B", "C");
-    
-    List<String> secondStringList = new LinkedList<String>();
+  
+    List<String> secondStringList = new LinkedList<>();
     secondStringList.add("Nothing");
     secondStringList.addAll(stringList);
     
@@ -379,7 +380,7 @@ public class ArrayListTest {
   public void containsAll_onNullList(List<String> stringList) {
     //given
     stringList = null;
-    List<String> secondStringList = new LinkedList<String>();
+    List<String> secondStringList = new LinkedList<>();
     
     //when
     secondStringList.add("Nothing");
@@ -793,14 +794,14 @@ public class ArrayListTest {
   }
   
   @Test(dataProvider = "collectionImpl")
-  public void retainAll_onFilledList_correct(List<String> stringList) {
+  public void retainAll_onFilledList_thenTrue(List<String> stringList) {
     //given
     createDefaultList(stringList);
     List<String> tempStringList = Arrays.asList("A", "B");
-    
+  
     //when
     boolean isRetained = stringList.retainAll(tempStringList);
-    
+  
     //then
     assert isRetained : "Should be TRUE!";
   
@@ -808,7 +809,369 @@ public class ArrayListTest {
     assert !containsLetterC : "Shouldn't contain C!";
   }
   
-  public void createDefaultList(List<String> stringList) {
+  @Test(dataProvider = "collectionImpl")
+  public void retainAll_onEmptyList_thenFalse(List<String> stringList) {
+    //given
+    List<String> tempStringList = Arrays.asList("A", "B");
+    
+    //when
+    boolean isRetained = stringList.retainAll(tempStringList);
+    
+    //then
+    assert !isRetained : "Should be FALSE!";
+    
+    boolean containsLetterC = stringList.contains("C");
+    assert !containsLetterC : "Shouldn't contain C!";
+  }
+  
+  @Test(dataProvider = "collectionImpl", expectedExceptions = NullPointerException.class)
+  public void retainAll_onNull_correct(List<String> stringList) {
+    //given
+    stringList = null;
+    List<String> tempStringList = Arrays.asList("A", "B");
+    
+    //when
+    boolean isRetained = stringList.retainAll(tempStringList);
+    
+    //then
+    //Exception
+  }
+  
+  @Test(dataProvider = "collectionImpl")
+  public void replaceAll_onFilledList_toLowerCase_ThenContainsLower(List<String> stringList) {
+    //given
+    createDefaultList(stringList);
+    UnaryOperator<String> stringUnaryOperator = s -> s.toLowerCase();
+    
+    //when
+    stringList.replaceAll(stringUnaryOperator);
+    
+    //then
+    String firstObject = stringList.get(0);
+    String expectedLetter = "a";
+    
+    assert firstObject.equals(expectedLetter) : "Should be 'a', but was: " + firstObject;
+    
+    boolean containsLetter_a = stringList.contains("a");
+    assert containsLetter_a : "Should contain 'a' !";
+  }
+  
+  @Test(dataProvider = "collectionImpl")
+  public void replaceAll_onEmptyList_correct(List<String> stringList) {
+    //given
+    UnaryOperator<String> stringUnaryOperator = s -> s.toLowerCase();
+    
+    //when
+    stringList.replaceAll(stringUnaryOperator);
+    
+    //then
+    int actualListSize = stringList.size();
+    int expectedSize = 0;
+    
+    assert actualListSize == expectedSize : "Actual size: " + actualListSize + " When expeted size is: " + expectedSize;
+  }
+  
+  @Test(dataProvider = "collectionImpl", expectedExceptions = NullPointerException.class)
+  public void replaceAll_onFilledListWithNullElement_thenNullException(List<String> stringList) {
+    //given
+    createDefaultList(stringList);
+    stringList.add(null);
+    
+    UnaryOperator<String> stringUnaryOperator = s -> s.toLowerCase();
+    
+    //when
+    stringList.replaceAll(stringUnaryOperator);
+    
+    //then
+    //Exception
+  }
+  
+  @Test(dataProvider = "collectionImpl")
+  public void set_onFilledList_thenCorrectAndCheckIfPreviousElementIsReturned(List<String> stringList) {
+    //given
+    createDefaultList(stringList);
+    
+    //when
+    String previousElement = stringList.set(0, "D");
+    
+    //then
+    String expectedPreviousString = "A";
+    
+    assert previousElement == expectedPreviousString : "Actual string: " + previousElement + " When expected string is: " + expectedPreviousString;
+  }
+  
+  @Test(dataProvider = "collectionImpl", expectedExceptions = IndexOutOfBoundsException.class)
+  public void set_onFilledList_elementIsNotExistingElement_thenException(List<String> stringList) {
+    //given
+    createDefaultList(stringList);
+    
+    //when
+    int listSize = stringList.size();
+    String previousElement = stringList.set(listSize, "D");
+    
+    //then
+    //Null Exception
+  }
+  
+  @Test(dataProvider = "collectionImpl", expectedExceptions = IndexOutOfBoundsException.class)
+  public void set_onEmptyList_thenException(List<String> stringList) {
+    //given
+    //setUp
+    
+    //when
+    int listSize = stringList.size();
+    String previousElement = stringList.set(listSize, "D");
+    
+    //then
+    //Null Exception
+  }
+  
+  @Test(dataProvider = "collectionImpl")
+  public void set_onFilledList_setNullElement_thenCorrect(List<String> stringList) {
+    //given
+    createDefaultList(stringList);
+    
+    //when
+    int listSizeBeforeSet = stringList.size();
+    String elementToReplace = null;
+    String previousElement = stringList.set(listSizeBeforeSet - 1, elementToReplace);
+    
+    //then
+    String actualLastElement = stringList.get(listSizeBeforeSet - 1);
+    assert actualLastElement == elementToReplace : "Actual element should be null, but was: " + actualLastElement;
+    
+    int actualSize = stringList.size();
+    assert listSizeBeforeSet == actualSize : "Actual size is: " + actualLastElement + " , but should be the same as the size before set: " + listSizeBeforeSet;
+  }
+  
+  @Test(dataProvider = "collectionImpl")
+  public void size_onFilledList_thenCorrect(List<String> stringList) {
+    //given
+    createDefaultList(stringList);
+    
+    //when
+    int listSize = stringList.size();
+    
+    //then
+    int expectedListSize = 5;
+    assert listSize == expectedListSize : "List size is: " + listSize + " when, expected is: " + expectedListSize;
+  }
+  
+  @Test(dataProvider = "collectionImpl")
+  public void size_onEmptyList_thenCorrect(List<String> stringList) {
+    //given
+    //setUp
+    
+    //when
+    int listSize = stringList.size();
+    
+    //then
+    int expectedListSize = 0;
+    assert listSize == expectedListSize : "List size is: " + listSize + " when, expected is: " + expectedListSize;
+  }
+  
+  @Test(dataProvider = "collectionImpl", expectedExceptions = NullPointerException.class)
+  public void size_onNulledList_thenException(List<String> stringList) {
+    //given
+    stringList = null;
+    
+    //when
+    stringList.size();
+    
+    //then
+    //Exception
+  }
+  
+  @Test(dataProvider = "collectionImpl")
+  public void sort_onFilledList_thenCorrect(List<String> stringList) {
+    //given
+    createDefaultList(stringList);
+    
+    //when
+    stringList.sort(Comparator.comparing(String::toString));
+    
+    //then
+    List<String> tempList = Arrays.asList("A", "B", "B", "C", "C");
+    
+    assert stringList.equals(tempList) : "Lists are not equal ! StringList:";
+  }
+  
+  @Test(dataProvider = "collectionImpl")
+  public void sort_onEmptyList_thenNotE(List<String> stringList) {
+    //given
+    //empty
+    
+    //when
+    stringList.sort(Comparator.comparing(String::toString));
+    
+    //then
+    List<String> tempList = Arrays.asList("A", "B", "B", "C", "C");
+    assert !stringList.equals(tempList) : "Lists are equal, but they shouldn't be ! StringList elements : " + stringList + " TempStringList elements: " + tempList;
+    
+    assert stringList.isEmpty() : "String list should be empty";
+  }
+  
+  @Test(dataProvider = "collectionImpl", expectedExceptions = NullPointerException.class)
+  public void sort_onFilledListWithNullElement_thenCorrect(List<String> stringList) {
+    //given
+    createDefaultList(stringList);
+    stringList.add(null);
+    
+    //when
+    stringList.sort(Comparator.comparing(String::toString));
+    
+    //then
+    //Exception
+  }
+  
+  @Test(dataProvider = "collectionImpl")
+  public void sort_onFilledListWithNumbersAndLetters_thenCorrect(List<String> stringList) {
+    //given
+    createDefaultList(stringList);
+    stringList.add("1");
+    stringList.add("2");
+    stringList.add("3");
+    stringList.add("4");
+    
+    //when
+    stringList.sort(Comparator.comparing(String::toString));
+    
+    //then
+    List<String> expectedList = Arrays.asList("1", "2", "3", "4", "A", "B", "B", "C", "C");
+    
+    assert stringList.equals(expectedList) : "Lists are not equal!";
+  }
+  
+  @Test(dataProvider = "collectionImpl")
+  public void splitIterator_isInstanceOf(List<String> stringList) {
+    //given
+    createDefaultList(stringList);
+    
+    //when
+    Spliterator<String> spliterator = stringList.spliterator();
+    
+    //then
+    assert spliterator instanceof Spliterator :
+        "Object is not instance of SplitIterator ! Actual class type: " + spliterator.getClass();
+  }
+  
+  @Test(dataProvider = "collectionImpl")
+  public void splitIterator_isNotNull(List<String> stringList) {
+    //given
+    createDefaultList(stringList);
+    
+    //when
+    Spliterator<String> spliterator = stringList.spliterator();
+    
+    //then
+    assert spliterator != null :
+        "Object is not instance of SplitIterator ! Actual class type: " + spliterator.getClass();
+  }
+  
+  @Test(dataProvider = "collectionImpl")
+  public void subList_onFilledList_onWholeList_thenCorrect(List<String> stringList) {
+    //given
+    createDefaultList(stringList);
+    
+    //when
+    List<String> subListResult = stringList.subList(0, stringList.size());
+    
+    //then
+    List<String> expectedList = new ArrayList<>();
+    createDefaultList(expectedList);
+    assert subListResult.equals(expectedList);
+  }
+  
+  @Test(dataProvider = "collectionImpl")
+  public void subList_onEmptyList_isEmpty(List<String> stringList) {
+    //given
+    //setUp
+    
+    //when
+    List<String> subListResult = stringList.subList(0, stringList.size());
+    
+    //then
+    List<String> filledList = new ArrayList<>();
+    boolean isEmpty = subListResult.isEmpty();
+    assert isEmpty : "Actual list: " + subListResult + " , but should be empty.";
+  }
+  
+  @Test(dataProvider = "collectionImpl", expectedExceptions = IndexOutOfBoundsException.class, expectedExceptionsMessageRegExp = "fromIndex = -1")
+  public void subList_onFilledList_leftBoundaryIndex_thenException(List<String> stringList) {
+    //given
+    createDefaultList(stringList);
+    
+    //when
+    List<String> subListResult = stringList.subList(-1, stringList.size());
+    
+    //then
+    //Exception
+  }
+  
+  @Test(dataProvider = "collectionImpl", expectedExceptions = IndexOutOfBoundsException.class, expectedExceptionsMessageRegExp = "toIndex = 6")
+  public void subList_onFilledList_rightBoundaryIndex_thenException(List<String> stringList) {
+    //given
+    createDefaultList(stringList);
+    
+    //when
+    List<String> subListResult = stringList.subList(0, stringList.size() + 1);
+    
+    //then
+    //Exception
+  }
+  
+  @Test(dataProvider = "collectionImpl")
+  public void subList_onFilledList_somePartOfTheList(List<String> stringList) {
+    //given
+    createDefaultList(stringList);
+    
+    //when
+    List<String> subListResult = stringList.subList(1, 4);
+    
+    //then
+    List<String> expectedSubList = Arrays.asList("B", "C", "B");
+    assert subListResult.equals(expectedSubList) : "Expected other list: " + expectedSubList + " , but the result of sub list: " + subListResult;
+  }
+  
+  @Test(dataProvider = "collectionImpl")
+  public void toArray_onFilledList_thenTheSameAsExpected(List<String> stringList) {
+    //given
+    createDefaultList(stringList);
+    
+    //when
+    Object[] arrayFromList = stringList.toArray();
+    
+    //then
+    Object[] expectedArray = {"A", "B", "C", "B", "C"};
+    assert Arrays.deepEquals(arrayFromList, expectedArray) : "Expected other list: " + expectedArray + " , but the result of sub list: " + arrayFromList;
+  }
+  
+  @Test(dataProvider = "collectionImpl")
+  public void toArray_onEmptyList_thenTheSameAsExpected(List<String> stringList) {
+    //given
+    //setUp
+    
+    //when
+    Object[] arrayFromList = stringList.toArray();
+    
+    //then
+    Object[] expectedArray = {};
+    assert Arrays.deepEquals(arrayFromList, expectedArray) : "Expected other list: " + expectedArray + " , but the result of sub list: " + arrayFromList;
+  }
+  
+  @Test(dataProvider = "collectionImpl", expectedExceptions = NullPointerException.class)
+  public void toArray_onNullList_thenNullPointerException(List<String> stringList) {
+    //given
+    stringList = null;
+    
+    //when
+    Object[] arrayFromList = stringList.toArray();
+    
+    //then
+    //Exception
+  }
+  
+  private void createDefaultList(List<String> stringList) {
     stringList.add("A");
     stringList.add("B");
     stringList.add("C");
